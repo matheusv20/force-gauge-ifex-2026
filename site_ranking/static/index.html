@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Medidor de Força — Ranking ao Vivo</title>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🔨</text></svg>">
+  <!-- Fontes (se estiver offline, o tema usa fontes do sistema automaticamente) -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bungee&family=Orbitron:wght@500;700;900&family=Rajdhani:wght@500;600;700&display=swap">
+  <link rel="stylesheet" href="/css/common.css">
+  <link rel="stylesheet" href="/css/telao.css">
+</head>
+<body class="telao">
+
+  <!-- ===================== CABEÇALHO ===================== -->
+  <header class="top">
+    <div class="brand">
+      <div class="bulbs" id="bulbsTop"></div>
+      <h1 class="neon-text">⚡ MEDIDOR DE FORÇA ⚡</h1>
+      <div class="bulbs" id="bulbsBottom"></div>
+    </div>
+    <div class="status-wrap">
+      <div id="statusPill" class="status-pill st-idle">
+        <span class="icon">💤</span><span class="label">Em Repouso</span>
+      </div>
+      <div id="statusSub" class="status-sub">Aproxime-se da máquina para jogar!</div>
+    </div>
+    <div class="top-right">
+      <div id="clock" class="clock">--:--</div>
+      <div class="conn" title="Conexão com o servidor / Arduino">
+        <span id="srvDot" class="conn-dot"></span> <span id="srvTxt">Servidor</span>
+        <span id="ardDot" class="conn-dot"></span> <span id="ardTxt">Arduino</span>
+      </div>
+    </div>
+  </header>
+
+  <main class="stage">
+    <!-- ===================== MEDIDOR (HIGH STRIKER) ===================== -->
+    <section class="panel striker-panel">
+      <div class="player-line">
+        <span class="lbl">JOGADOR</span>
+        <span id="playerName" class="player-name neon-cyan">—</span>
+      </div>
+
+      <div class="striker-area">
+        <div class="striker" id="striker">
+          <div class="bell" id="bell">🔔</div>
+          <div class="tube-wrap">
+            <div class="tiers" id="tiers"></div>
+            <div class="tube idle" id="tube" style="--level:0">
+              <div class="tube-bg"></div>
+              <div class="fill"></div>
+              <div class="ticks" id="ticks"></div>
+              <div class="puck"></div>
+              <div class="shine"></div>
+            </div>
+          </div>
+          <div class="pad"><span>ALVO</span></div>
+        </div>
+
+        <div class="readout">
+          <div class="score-box">
+            <div class="score-label">PONTUAÇÃO</div>
+            <div id="score" class="score">000</div>
+            <div id="tierName" class="tier-name">&nbsp;</div>
+          </div>
+          <div class="metric">
+            <div class="m-icon">💨</div>
+            <div>
+              <div class="m-label">VELOCIDADE</div>
+              <div class="m-value"><span id="mSpeedMs">—</span> <small>m/s</small></div>
+              <div class="m-sub"><span id="mSpeedKmh">—</span> km/h</div>
+            </div>
+          </div>
+          <div class="metric">
+            <div class="m-icon">💪</div>
+            <div>
+              <div class="m-label">ÍNDICE DE FORÇA</div>
+              <div class="m-value"><span id="mForce">—</span> <small>kgf</small></div>
+              <div class="m-sub">pico no alvo</div>
+            </div>
+          </div>
+          <div id="rankBanner" class="rank-banner"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===================== RANKING ===================== -->
+    <section class="panel board-panel">
+      <h2 class="board-title"><span class="neon-yellow">🏆 RANKING</span> <span id="count" class="count">0 jogadores</span></h2>
+
+      <div class="podium" id="podium"></div>
+
+      <div class="table-wrap" id="tableWrap">
+        <table class="board">
+          <thead>
+            <tr>
+              <th>#</th><th class="l">Nome</th><th>Pontos</th><th>Velocidade</th><th>Força</th><th>Horário</th>
+            </tr>
+          </thead>
+          <tbody id="boardBody"></tbody>
+        </table>
+        <div id="emptyBoard" class="empty">Nenhum resultado ainda.<br>Seja o primeiro a bater no alvo! 🔨</div>
+      </div>
+
+      <div class="highlights">
+        <div><span class="hl-ico">💨</span> Maior velocidade: <b id="hlSpeed">—</b></div>
+        <div><span class="hl-ico">💪</span> Maior força: <b id="hlForce">—</b></div>
+      </div>
+    </section>
+  </main>
+
+  <!-- ===================== OVERLAYS ===================== -->
+  <div id="recordOverlay" class="record-overlay">
+    <div class="record-box">
+      <div class="record-title">🏆 NOVO RECORDE! 🏆</div>
+      <div id="recordName" class="record-name">—</div>
+      <div id="recordScore" class="record-score">0</div>
+      <div class="record-sub">FORÇA DE IMPACTO</div>
+    </div>
+  </div>
+
+  <canvas id="confetti"></canvas>
+
+  <div id="unlock" class="unlock">
+    <div class="unlock-box">
+      <div class="unlock-ico">🔊</div>
+      <div class="unlock-title">Clique para ativar o som</div>
+      <div class="unlock-sub">Atalhos: <b>F</b> tela cheia · <b>M</b> mudo · <b>T</b> testar animação</div>
+    </div>
+  </div>
+
+  <div class="corner-tools">
+    <button id="btnMute" class="btn small purple" title="Som (M)">🔊</button>
+    <button id="btnFull" class="btn small purple" title="Tela cheia (F)">⛶</button>
+    <a class="btn small purple" href="/operador" target="_blank" title="Painel do Operador">🎛️</a>
+  </div>
+
+  <script src="/js/common.js"></script>
+  <script src="/js/telao.js"></script>
+</body>
+</html>

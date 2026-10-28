@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Painel do Operador — Medidor de Força</title>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🎛️</text></svg>">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bungee&family=Orbitron:wght@500;700;900&family=Rajdhani:wght@500;600;700&display=swap">
+  <link rel="stylesheet" href="/css/common.css">
+  <link rel="stylesheet" href="/css/operador.css">
+</head>
+<body class="operador">
+
+  <header class="op-top">
+    <h1 class="neon-text">🎛️ PAINEL DO OPERADOR</h1>
+    <div class="op-top-right">
+      <span class="srv"><span id="srvDot" class="conn-dot"></span> <span id="srvTxt">Servidor…</span></span>
+      <a class="btn pink" href="/" target="_blank">📺 Abrir Telão</a>
+    </div>
+  </header>
+
+  <main class="op-grid">
+
+    <!-- ============ CONEXÃO SERIAL ============ -->
+    <section class="panel card serial-card">
+      <h2>🔌 Conexão USB Serial</h2>
+      <div class="serial-status">
+        <span id="ardDot" class="conn-dot"></span>
+        <span id="serialTxt">Desconectado</span>
+      </div>
+      <div class="row">
+        <label class="field grow">
+          <span>Porta</span>
+          <input id="portInput" list="portList" placeholder="/dev/ttyACM0" autocomplete="off" spellcheck="false">
+          <datalist id="portList"></datalist>
+        </label>
+        <button id="btnRefresh" class="btn small" title="Procurar portas">🔄</button>
+        <label class="field">
+          <span>Baud</span>
+          <select id="baudSelect">
+            <option>9600</option><option>57600</option><option selected>115200</option>
+          </select>
+        </label>
+      </div>
+      <div id="portsHint" class="hint"></div>
+      <button id="btnConnect" class="btn primary full">🔌 Conectar</button>
+      <p class="hint">💡 Clique em <b>Desconectar</b> antes de gravar código no Arduino pela Arduino IDE — a porta é liberada na hora.</p>
+    </section>
+
+    <!-- ============ ESTADO + RODADA ============ -->
+    <section class="panel card round-card" id="roundCard">
+      <h2>🎯 Rodada</h2>
+      <div id="statusPill" class="status-pill st-idle big"><span class="icon">💤</span><span class="label">Em Repouso</span></div>
+      <div id="statusMsg" class="status-msg">—</div>
+
+      <label class="field name-field">
+        <span>Nome do Participante</span>
+        <input id="nameInput" maxlength="40" placeholder="Digite o nome e pressione Enter" autocomplete="off">
+      </label>
+      <div class="lcd-preview">
+        <span class="lcd-label">LCD 16×2:</span>
+        <span id="lcdPreview" class="lcd">________________</span>
+        <span id="lcdCount" class="lcd-count">0/15</span>
+      </div>
+
+      <button id="btnStart" class="btn primary full">▶️ Iniciar Rodada</button>
+      <div class="row stretch">
+        <button id="btnReset" class="btn danger grow">⛔ Cancelar / Resetar</button>
+        <button id="btnTare" class="btn warn grow">⚖️ Zerar Tara</button>
+      </div>
+      <div id="pendingInfo" class="hint"></div>
+    </section>
+
+    <!-- ============ TESTES ============ -->
+    <section class="panel card test-card">
+      <h2>🧪 Testes / Simulação</h2>
+      <p class="hint">Funciona mesmo com o Arduino desconectado. Resultados simulados ficam marcados como <b>TESTE</b>.</p>
+      <button id="btnSimPir" class="btn yellow full">👀 Simular Detecção no PIR</button>
+      <div class="row">
+        <label class="field grow">
+          <span>Intensidade</span>
+          <select id="simLevel">
+            <option value="aleatorio">🎲 Aleatório</option>
+            <option value="fraco">🐣 Fraco</option>
+            <option value="medio">💪 Médio</option>
+            <option value="forte">🦍 Forte</option>
+            <option value="recorde">🏆 Novo Recorde!</option>
+          </select>
+        </label>
+      </div>
+      <button id="btnSimHit" class="btn pink full">🔨 Simular Golpe de Teste</button>
+
+      <div class="last-result" id="lastResult">
+        <div class="lr-title">Último resultado</div>
+        <div class="lr-body">—</div>
+      </div>
+    </section>
+
+    <!-- ============ RANKING ============ -->
+    <section class="panel card ranking-card">
+      <div class="card-head">
+        <h2>🏆 Ranking <span id="rankCount" class="muted">(0)</span></h2>
+        <div class="row tight">
+          <a class="btn small" href="/api/export.csv" download>⬇️ CSV</a>
+          <a class="btn small" href="/api/export.json" download>⬇️ JSON</a>
+          <button id="btnClearSim" class="btn small warn">🧹 Limpar testes</button>
+          <button id="btnClear" class="btn small danger">🗑️ Limpar ranking</button>
+        </div>
+      </div>
+      <div class="table-scroll">
+        <table class="op-table">
+          <thead>
+            <tr><th>#</th><th class="l">Nome</th><th>Pontos</th><th>m/s</th><th>km/h</th><th>kgf</th><th>Bruto</th><th>Horário</th><th>Origem</th><th></th></tr>
+          </thead>
+          <tbody id="rankBody"></tbody>
+        </table>
+        <div id="rankEmpty" class="empty-small">Nenhum resultado registrado.</div>
+      </div>
+      <p class="hint">💾 Salvo automaticamente em <code>site_ranking/data/ranking.json</code>. Ao limpar, um backup é criado em <code>data/backups/</code>.</p>
+    </section>
+
+    <!-- ============ MONITOR SERIAL ============ -->
+    <section class="panel card monitor-card">
+      <div class="card-head">
+        <h2>🖥️ Monitor Serial</h2>
+        <div class="row tight">
+          <label class="chk"><input type="checkbox" id="chkDebug" checked> debug</label>
+          <label class="chk"><input type="checkbox" id="chkAuto" checked> rolagem</label>
+          <button id="btnClearLog" class="btn small purple">Limpar</button>
+        </div>
+      </div>
+      <div id="log" class="log"></div>
+      <div class="row">
+        <input id="rawInput" class="grow mono" placeholder="Enviar linha manual ao Arduino (ex.: RESET)" autocomplete="off" spellcheck="false">
+        <button id="btnRaw" class="btn small">Enviar ↵</button>
+      </div>
+    </section>
+  </main>
+
+  <script src="/js/common.js"></script>
+  <script src="/js/operador.js"></script>
+</body>
+</html>

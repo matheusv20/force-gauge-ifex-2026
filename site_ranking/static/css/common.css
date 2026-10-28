@@ -1,0 +1,209 @@
+/* =========================================================================
+   MEDIDOR DE FORÇA — Tema Arcade / Parque de Diversões / Neon (comum)
+   ========================================================================= */
+:root {
+  --bg: #07021a;
+  --bg2: #12052e;
+  --panel: rgba(22, 8, 52, 0.78);
+  --panel-border: rgba(160, 90, 255, 0.35);
+  --text: #f3eaff;
+  --muted: #a99ccc;
+  --pink: #ff2bd6;
+  --cyan: #00f0ff;
+  --yellow: #ffe600;
+  --green: #39ff14;
+  --orange: #ff8a00;
+  --red: #ff2a4d;
+  --purple: #a259ff;
+  --gold: #ffd54a;
+  --silver: #d7e3f4;
+  --bronze: #e08a4a;
+  --radius: 18px;
+  --font-title: "Bungee", "Impact", "Arial Black", sans-serif;
+  --font-digit: "Orbitron", "Consolas", "DejaVu Sans Mono", monospace;
+  --font-body: "Rajdhani", "Segoe UI", "Ubuntu", "Noto Sans", sans-serif;
+}
+
+* { box-sizing: border-box; }
+
+html, body {
+  margin: 0;
+  min-height: 100%;
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font-body);
+  font-size: 17px;
+}
+
+body {
+  background:
+    radial-gradient(ellipse at 15% -10%, rgba(255, 43, 214, 0.28), transparent 55%),
+    radial-gradient(ellipse at 90% 0%, rgba(0, 240, 255, 0.20), transparent 50%),
+    radial-gradient(ellipse at 50% 120%, rgba(162, 89, 255, 0.35), transparent 60%),
+    linear-gradient(180deg, var(--bg2), var(--bg));
+  background-attachment: fixed;
+}
+
+/* grade "synthwave" no fundo */
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  background-image:
+    linear-gradient(rgba(162, 89, 255, 0.07) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(162, 89, 255, 0.07) 1px, transparent 1px);
+  background-size: 48px 48px;
+  mask-image: linear-gradient(180deg, transparent, #000 70%);
+  z-index: 0;
+}
+
+.neon-text {
+  font-family: var(--font-title);
+  color: #fff;
+  text-shadow:
+    0 0 4px #fff,
+    0 0 12px var(--pink),
+    0 0 26px var(--pink),
+    0 0 48px var(--purple);
+  letter-spacing: 0.04em;
+}
+
+.neon-cyan { color: var(--cyan); text-shadow: 0 0 8px var(--cyan), 0 0 22px rgba(0, 240, 255, .6); }
+.neon-yellow { color: var(--yellow); text-shadow: 0 0 8px var(--yellow), 0 0 22px rgba(255, 230, 0, .5); }
+.neon-pink { color: var(--pink); text-shadow: 0 0 8px var(--pink), 0 0 22px rgba(255, 43, 214, .5); }
+
+.panel {
+  position: relative;
+  background: var(--panel);
+  border: 1px solid var(--panel-border);
+  border-radius: var(--radius);
+  box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.03) inset, 0 10px 40px rgba(0, 0, 0, 0.45),
+    0 0 30px rgba(162, 89, 255, 0.12);
+  backdrop-filter: blur(6px);
+}
+
+/* Lâmpadas piscando estilo letreiro de parque */
+.bulbs {
+  display: flex;
+  justify-content: space-between;
+  gap: 6px;
+  padding: 0 6px;
+}
+.bulbs span {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: var(--yellow);
+  box-shadow: 0 0 6px var(--yellow), 0 0 14px var(--orange);
+  animation: bulb 1s steps(1) infinite;
+}
+.bulbs span:nth-child(even) { animation-delay: .5s; }
+@keyframes bulb {
+  0% { opacity: 1; }
+  50% { opacity: .18; box-shadow: none; }
+}
+
+/* ----- Status da máquina (comum Telão/Operador) ----- */
+.status-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: .6em;
+  padding: .5em 1.1em;
+  border-radius: 999px;
+  font-family: var(--font-title);
+  letter-spacing: .03em;
+  border: 2px solid currentColor;
+  background: rgba(0, 0, 0, .35);
+  transition: color .3s, box-shadow .3s;
+  white-space: nowrap;
+}
+.status-pill .icon { font-size: 1.2em; }
+.st-idle { color: var(--cyan); box-shadow: 0 0 14px rgba(0, 240, 255, .35); }
+.st-detected { color: var(--yellow); box-shadow: 0 0 22px rgba(255, 230, 0, .6); animation: pulse 0.9s ease-in-out infinite; }
+.st-ready { color: var(--green); box-shadow: 0 0 26px rgba(57, 255, 20, .7); animation: pulse 0.6s ease-in-out infinite; }
+.st-result { color: var(--pink); box-shadow: 0 0 22px rgba(255, 43, 214, .6); }
+.st-unknown { color: var(--muted); }
+
+@keyframes pulse {
+  0%, 100% { transform: scale(1); filter: brightness(1); }
+  50% { transform: scale(1.04); filter: brightness(1.35); }
+}
+
+.conn-dot {
+  display: inline-block;
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: var(--red);
+  box-shadow: 0 0 10px var(--red);
+  vertical-align: middle;
+}
+.conn-dot.on { background: var(--green); box-shadow: 0 0 10px var(--green); }
+
+/* ----- Botões ----- */
+.btn {
+  --c: var(--cyan);
+  appearance: none;
+  border: 2px solid var(--c);
+  color: var(--c);
+  background: rgba(0, 0, 0, .35);
+  font-family: var(--font-title);
+  font-size: .95rem;
+  letter-spacing: .03em;
+  padding: .75em 1.1em;
+  border-radius: 12px;
+  cursor: pointer;
+  transition: transform .08s, box-shadow .2s, background .2s, opacity .2s;
+  text-shadow: 0 0 8px var(--c);
+  box-shadow: 0 0 10px color-mix(in srgb, var(--c) 35%, transparent);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: .5em;
+  text-decoration: none;
+  user-select: none;
+}
+.btn:hover:not(:disabled) {
+  background: color-mix(in srgb, var(--c) 18%, transparent);
+  box-shadow: 0 0 22px color-mix(in srgb, var(--c) 70%, transparent);
+}
+.btn:active:not(:disabled) { transform: scale(.97); }
+.btn:disabled { opacity: .4; cursor: not-allowed; }
+.btn.primary { --c: var(--green); font-size: 1.15rem; padding: .9em 1.4em; }
+.btn.danger { --c: var(--red); }
+.btn.warn { --c: var(--orange); }
+.btn.pink { --c: var(--pink); }
+.btn.yellow { --c: var(--yellow); }
+.btn.purple { --c: var(--purple); }
+.btn.small { font-size: .78rem; padding: .45em .7em; border-radius: 9px; }
+.btn.busy { pointer-events: none; opacity: .65; }
+
+/* ----- Toasts ----- */
+#toasts {
+  position: fixed;
+  right: 18px;
+  bottom: 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  z-index: 9999;
+  max-width: min(440px, 90vw);
+}
+.toast {
+  background: rgba(20, 6, 45, .95);
+  border-left: 5px solid var(--cyan);
+  padding: 12px 16px;
+  border-radius: 10px;
+  box-shadow: 0 8px 30px rgba(0, 0, 0, .5);
+  animation: toast-in .25s ease-out;
+  font-size: 1rem;
+}
+.toast.ok { border-color: var(--green); }
+.toast.error { border-color: var(--red); }
+.toast.warn { border-color: var(--orange); }
+@keyframes toast-in { from { transform: translateX(30px); opacity: 0; } }
+
+::-webkit-scrollbar { width: 10px; height: 10px; }
+::-webkit-scrollbar-thumb { background: rgba(162, 89, 255, .45); border-radius: 10px; }
+::-webkit-scrollbar-track { background: transparent; }
